@@ -1,20 +1,20 @@
-# aws_sns_topic plugin
+# postmark plugin
 
-[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-aws_sns_topic)
+[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-postmark)
 
 ## Getting Started
 
-This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-aws_sns_topic`, add it to your project by running:
+This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-postmark`, add it to your project by running:
 
 ```bash
-fastlane add_plugin aws_sns_topic
+fastlane add_plugin postmark
 ```
 
-## About aws_sns_topic
+## About 
 
-Fastlane plugin to public message to SNS topic.
+Fastlane plugin to send emails via [Postmark](https://postmarkapp.com/).
 
-This plugin can be very handy to notify a group of people about a new app release. Create a AWS SNS topic, add recipient email addresses to the topic, then send a message to that topic with this plugin. Done! 
+This plugin can be very handy to notify a group of people about a new app release.
 
 ## Example
 
@@ -26,19 +26,17 @@ notification_message_body = [
     changelog
 ].join("\n") + "\n"
 
-aws_sns_topic(
-    access_key: ENV['S3_ACCESS_KEY'],
-    secret_access_key: ENV['S3_SECRET_ACCESS_KEY'],
-    region: 'us-east-1',
-    topic_arn: 'arn:aws:sns:us-east-1:167512897889:topic-name-here',
-    subject: "App v#{versionOfApp} ready for download",
-    message: notification_message_body
+postmark(
+    api_key: "server-token", # Or, set `POSTMARK_API_KEY` environment variable 
+    from: "First Last <you@you.com>", # Or, set `POSTMARK_FROM_EMAIL_ADDRESS` environment variable 
+    to: "dana@gmail.com, other-person@example.com", # comma separated list of people to send to. Or, set `POSTMARK_TO_EMAIL_ADDRESS` environment variable 
+    subject: "App v#{versionOfApp} ready for download", # Or, set `POSTMARK_EMAIL_SUBJECT` environment variable 
+    message_text: notification_message_body, # text only email body. If you want to use HTML instead, leave this blank. 
+    message_html: "<h1>...</h1>", # HTML email body. If you want to use text instead, leave this blank. 
 )
 ```
 
-*Note: It is recommended to not store the AWS access keys in the `Fastfile`.*
-
-*Note: The only permissions you need to add to your AWS IAM user is `SNS:Publish` to the SNS topic you created.*
+*Note: It is recommended to not store the API key in the `Fastfile`.*
 
 ## Development
 

@@ -7,25 +7,15 @@ module Fastlane
   module Actions
     class PostmarkAction < Action
       def self.run(params)
-        access_key = params[:access_key]
-        secret_access_key = params[:secret_access_key]
-        region = params[:region]
+        email_sender = Helper::Postmark.new(params[:api_key])
 
-        topic_arn = params[:topic_arn]
-        message = params[:message]
-        subject = params[:subject]
-
-        Helper::AwsSnsTopicHelper.verify_params(params, [:access_key, :secret_access_key, :region, :topic_arn, :message, :subject])
-
-        topic_sender = Helper::AwsSns.new(access_key, secret_access_key, region, topic_arn)
-
-        UI.message("Sending message to SNS topic...")
-        topic_sender.publish_message(message, subject)
-        UI.success("AWS SNS Topic message sent!")
+        UI.message("Sending email via Postmark...")
+        email_sender.send(params[:from], params[:to], params[:subject], params[:message_text], params[:message_html])
+        UI.success("Email sent successfully!")
       end
 
       def self.description
-        ""
+        "Send emails via Postmark in fastlane!"
       end
 
       def self.authors
@@ -37,41 +27,39 @@ module Fastlane
       end
 
       def self.details
-        "Public a new message to an AWS SNS topic. Created with the original intent of notifying a SNS topic about a new app release."
+        "Already using Postmark to send emails in your project? Send emails to 1 or more people with ease. Created with the original intent of notifying a group of people of an app release."
       end
 
       def self.available_options
         [
-          FastlaneCore::ConfigItem.new(key: :access_key,
-                                       env_name: "AWS_SNS_ACCESS_KEY",
-                                       description: "AWS Access Key ID",
+          FastlaneCore::ConfigItem.new(key: :api_key,
+                                       env_name: "POSTMARK_API_KEY",
+                                       description: "Postmark server API ID",
                                        optional: false,
-                                       default_value: ENV['AWS_ACCESS_KEY_ID']),
-          FastlaneCore::ConfigItem.new(key: :secret_access_key,
-                                       env_name: "AWS_SNS_SECRET_ACCESS_KEY",
-                                       description: "AWS Secret Access Key",
+                                       default_value: ENV['POSTMARK_API_KEY']),
+          FastlaneCore::ConfigItem.new(key: :from,
+                                       env_name: "POSTMARK_FROM_EMAIL_ADDRESS",
+                                       description: "Email address to send emails as. This should be an email address from the domain in your Postmark account.",
                                        optional: false,
-                                       default_value: ENV['AWS_SECRET_ACCESS_KEY']),
-          FastlaneCore::ConfigItem.new(key: :region,
-                                       env_name: "AWS_SNS_REGION",
-                                       description: "AWS Region",
+                                       default_value: ENV['POSTMARK_FROM_EMAIL_ADDRESS']),
+          FastlaneCore::ConfigItem.new(key: :to,
+                                       env_name: "POSTMARK_TO_EMAIL_ADDRESS",
+                                       description: "List of email addresses you want to send the email to. Comma separated string is accepted.",
                                        optional: false,
-                                       default_value: ENV['AWS_REGION']),
-          FastlaneCore::ConfigItem.new(key: :topic_arn,
-                                       env_name: "AWS_SNS_TOPIC_ARN",
-                                       description: "AWS SNS topic ARN for the topic to send message to",
-                                       optional: false,
-                                       default_value: ENV['AWS_SNS_TOPIC_ARN']),
-          FastlaneCore::ConfigItem.new(key: :message,
-                                       env_name: "AWS_SNS_TOPIC_MESSAGE",
-                                       description: "The message you want to send to the AWS SNS topic",
-                                       optional: false,
-                                       default_value: ENV['AWS_SNS_TOPIC_MESSAGE']),
+                                       default_value: ENV['POSTMARK_TO_EMAIL_ADDRESS']),
           FastlaneCore::ConfigItem.new(key: :subject,
-                                       env_name: "AWS_SNS_TOPIC_SUBJECT",
-                                       description: "The subject you want to send to the AWS SNS topic",
+                                       env_name: "POSTMARK_EMAIL_SUBJECT",
+                                       description: "The subject you want your email to have",
                                        optional: false,
-                                       default_value: ENV['AWS_SNS_TOPIC_SUBJECT'])
+                                       default_value: ENV['POSTMARK_EMAIL_SUBJECT']),
+          FastlaneCore::ConfigItem.new(key: :message_text,
+                                       env_name: "POSTMARK_EMAIL_MESSAGE_TEXT",
+                                       description: "The body you want your email to have. Text only. If you want to use html instead, leave this option blank.",
+                                       optional: true),
+          FastlaneCore::ConfigItem.new(key: :message_html,
+                                       env_name: "POSTMARK_EMAIL_MESSAGE_HTML",
+                                       description: "The body you want your email to have. HTML only. If you want to use text instead, leave this option blank.",
+                                       optional: true)
         ]
       end
 
