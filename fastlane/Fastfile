@@ -1,6 +1,6 @@
-# Example fastlane fastfile to test out the plugin. 
-# 
-# Build and install the plugin on your local machine by following the readme. Then, test this out with the command: 
+# Example fastlane fastfile to test out the plugin.
+#
+# Build and install the plugin on your local machine by following the readme. Then, test this out with the command:
 # `POSTMARK_API_KEY="token" POSTMARK_FROM_EMAIL_ADDRESS="you@you.com" POSTMARK_TO_EMAIL_ADDRESS="to@to.com" bundle exec fastlane test_plugin`
 
 lane :test_plugin do
@@ -16,10 +16,10 @@ lane :test_plugin do
   ].join("\n") + "\n"
 
   postmark(
-      # Set `POSTMARK_API_KEY` environment variable
-      # Set `POSTMARK_FROM_EMAIL_ADDRESS` environment variable 
-      # Set `POSTMARK_TO_EMAIL_ADDRESS` environment variable 
-      subject: "TESTING POSTMARK FASTLANE PLUGIN", 
-      message_text: notification_message_body
+    # Set `POSTMARK_API_KEY` environment variable
+    # Set `POSTMARK_FROM_EMAIL_ADDRESS` environment variable
+    # Set `POSTMARK_TO_EMAIL_ADDRESS` environment variable
+    subject: "TESTING POSTMARK FASTLANE PLUGIN",
+    message_text: notification_message_body
   )
 end

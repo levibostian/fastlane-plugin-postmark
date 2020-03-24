@@ -6,12 +6,12 @@ module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
 
   module Actions
-    class PostmarkAction < Action 
+    class PostmarkAction < Action
       def self.run(params)
         @client = ::Postmark::ApiClient.new(params[:api_key])
-        
+
         UI.message("Sending email via Postmark...")
-        begin         
+        begin
           @client.deliver(
             from: params[:from],
             to: params[:to].split(",").map(&:strip),
