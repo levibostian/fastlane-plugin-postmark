@@ -1,16 +1,28 @@
 require 'fastlane/action'
 require_relative '../helper/postmark_helper'
+require 'postmark'
 
 module Fastlane
   UI = FastlaneCore::UI unless Fastlane.const_defined?("UI")
 
   module Actions
-    class PostmarkAction < Action
+    class PostmarkAction < Action 
       def self.run(params)
-        email_sender = Helper::Postmark.new(params[:api_key])
-
+        @client = ::Postmark::ApiClient.new(params[:api_key])
+        
         UI.message("Sending email via Postmark...")
-        email_sender.send(params[:from], params[:to], params[:subject], params[:message_text], params[:message_html])
+        begin         
+          @client.deliver(
+            from: params[:from],
+            to: params[:to].split(",").map(&:strip),
+            subject: params[:subject],
+            html_body: params[:message_html],
+            text_body: params[:message_text]
+          )
+        rescue => error
+          UI.crash!("Send email via Postmark error: #{error.inspect}")
+        end
+
         UI.success("Email sent successfully!")
       end
 
@@ -39,12 +51,12 @@ module Fastlane
                                        default_value: ENV['POSTMARK_API_KEY']),
           FastlaneCore::ConfigItem.new(key: :from,
                                        env_name: "POSTMARK_FROM_EMAIL_ADDRESS",
-                                       description: "Email address to send emails as. This should be an email address from the domain in your Postmark account.",
+                                       description: "Email address to send emails as. This should be an email address from the domain in your Postmark account",
                                        optional: false,
                                        default_value: ENV['POSTMARK_FROM_EMAIL_ADDRESS']),
           FastlaneCore::ConfigItem.new(key: :to,
                                        env_name: "POSTMARK_TO_EMAIL_ADDRESS",
-                                       description: "List of email addresses you want to send the email to. Comma separated string is accepted.",
+                                       description: "List of email addresses you want to send the email to. Comma separated string is accepted",
                                        optional: false,
                                        default_value: ENV['POSTMARK_TO_EMAIL_ADDRESS']),
           FastlaneCore::ConfigItem.new(key: :subject,
@@ -54,11 +66,11 @@ module Fastlane
                                        default_value: ENV['POSTMARK_EMAIL_SUBJECT']),
           FastlaneCore::ConfigItem.new(key: :message_text,
                                        env_name: "POSTMARK_EMAIL_MESSAGE_TEXT",
-                                       description: "The body you want your email to have. Text only. If you want to use html instead, leave this option blank.",
+                                       description: "The body you want your email to have. Text only. If you want to use html instead, leave this option blank",
                                        optional: true),
           FastlaneCore::ConfigItem.new(key: :message_html,
                                        env_name: "POSTMARK_EMAIL_MESSAGE_HTML",
-                                       description: "The body you want your email to have. HTML only. If you want to use text instead, leave this option blank.",
+                                       description: "The body you want your email to have. HTML only. If you want to use text instead, leave this option blank",
                                        optional: true)
         ]
       end

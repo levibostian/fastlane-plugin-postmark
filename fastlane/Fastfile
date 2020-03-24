@@ -1,3 +1,25 @@
-lane :test do
-  postmark
+# Example fastlane fastfile to test out the plugin. 
+# 
+# Build and install the plugin on your local machine by following the readme. Then, test this out with the command: 
+# `POSTMARK_API_KEY="token" POSTMARK_FROM_EMAIL_ADDRESS="you@you.com" POSTMARK_TO_EMAIL_ADDRESS="to@to.com" bundle exec fastlane test_plugin`
+
+lane :test_plugin do
+  version_of_app = "0.2.2"
+  build_version = "1112232"
+  changelog = "* this changed"
+
+  notification_message_body = [
+    "App v#{version_of_app}, build: #{build_version} ready for download.",
+    "\n",
+    "What has changed in this latest release?",
+    changelog
+  ].join("\n") + "\n"
+
+  postmark(
+      # Set `POSTMARK_API_KEY` environment variable
+      # Set `POSTMARK_FROM_EMAIL_ADDRESS` environment variable 
+      # Set `POSTMARK_TO_EMAIL_ADDRESS` environment variable 
+      subject: "TESTING POSTMARK FASTLANE PLUGIN", 
+      message_text: notification_message_body
+  )
 end

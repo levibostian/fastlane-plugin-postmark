@@ -55,6 +55,8 @@ To automatically fix many of the styling issues, use
 bundle exec rubocop -a
 ```
 
+You can test out the plugin using the instructions in the example Fastfile. Check out `./fastlane/Fastfile`.
+
 ## Issues and Feedback
 
 For any other issues and feedback about this plugin, please submit it to this repository.
